@@ -1,7 +1,7 @@
 from classes import *
 import numpy as np
 import matplotlib.pyplot as plt
-import winsound
+# import winsound
 
 def drawMap(car, world):
     x, y = car.curState.crd
@@ -55,7 +55,7 @@ initS = State(startPt, 0, dists = dists, destPos = destPos)
 cnt = 0
 rList = []
 for _ in range(numExperiments):
-    
+
     car = Agent(initS, initD)
 
     print("Start training...")
@@ -69,7 +69,7 @@ for _ in range(numExperiments):
             action = car.takeAction(epsilon_training)
             s, r, t = car.interact(action, envTrain, lr = learning_rate, y = discount_factor)
             k += 1
-            
+
 ##        rList.append(car.rTotal)
         if i % 100 == 0:
             print("Iter", i, car.rTotal)
@@ -86,7 +86,7 @@ for _ in range(numExperiments):
         action = newCar.takeAction(epsilon_experiment)
         s, _, _ = newCar.interact(action, envExp, update = False)
         print(action, s.crd, s.v, s.destPos, newCar.direction)
-        
+
     if np.all(s.crd == envExp.dest):
         print("Arrive!")
         cnt += 1
@@ -97,4 +97,4 @@ print(rList)
 
 ##drawMap(newCar, world)
 
-winsound.Beep(1000, 200)
+# winsound.Beep(1000, 200)
