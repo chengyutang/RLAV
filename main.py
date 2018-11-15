@@ -59,7 +59,7 @@ car = Agent(initS, initD)
 
 # Start of numExperiments times of Experiments
 for _ in range(numExperiments):
-    
+
     car = Agent(initS, initD)
 
     # Train
@@ -74,7 +74,7 @@ for _ in range(numExperiments):
             action = car.takeAction(epsilon_training)
             s, r, t = car.interact(action, envTrain, lr = learning_rate, y = discount_factor)
             k += 1
-            
+
 ##        rList.append(car.rTotal)
         if i % 500 == 0:
             print("Iter", i, car.rTotal)
@@ -92,7 +92,7 @@ for _ in range(numExperiments):
         action = newCar.takeAction(epsilon_experiment)
         s, _, _ = newCar.interact(action, envExp, update = False)
         print(s.crd, action, s.v, s.dists, s.destPos, newCar.direction)
-        
+
     if np.all(s.crd == envExp.dest):
         print("Arrive!")
         cnt += 1
