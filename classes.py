@@ -2,14 +2,14 @@ import numpy as np
 
 class Environment(object):
     
-    def __init__(self, world = [], visibility = [2, 1, 1], speedLimit = 1):
+    def __init__(self, world = [], visibility = [1, 1, 1], speedLimit = 1):
         self.world = world # 1 for car, 2 for people, 3 for destiny
-        self.rewards = [0, -50, -80, 100]
+        self.rewardTable = [0, -100, -800, 10000]
         self.visibility = visibility
         self.speedLimit = speedLimit
         
     def stateTransition(self, curState, action, direction):
-        # action: [steering wheel, gas pedal]
+        # action: [(-1, 0, 1), (-1, 0, 1)], [steering wheel, gas pedal]
         
         newV = curState.v + action[1]
         newV = min(newV, self.speedLimit)
@@ -31,7 +31,7 @@ class Environment(object):
         
         newV, newCrd = self.stateTransition(curState, action, direction)
         
-        reward += self.rewards[self.world[newCrd[0], newCrd[1]]]
+        reward += self.rewardTable[self.world[newCrd[0], newCrd[1]]]
         newDists, dest = self.calDists(newCrd, direction)
 
         # check termination
@@ -80,24 +80,25 @@ class Environment(object):
 class Agent(object):
     
     def __init__(self, curState, direction, QTable = None):
-        self.actions = np.array([[ 0, 0], [ 0, 1], [ 0, -1],
-                                 [ 1, 0], [ 1, 1], [ 1, -1],
-                                 [-1, 0], [-1, 1], [-1, -1]]) # [steering wheel, gas pedal]
+        self.actions = np.array([[ 0, 0], [ 1, 0], [-1, 0]])
+        # self.actions = np.array([[ 0, 0], [ 0, 1], [ 0, -1],
+        #                          [ 1, 0], [ 1, 1], [ 1, -1],
+        #                          [-1, 0], [-1, 1], [-1, -1]]) # [steering wheel, gas pedal]
         
-##        self.actions = np.array([[ 0, 1], [ 1, 1], [-1, 1],
-##                                 [ 0, 0], [ 1, 0], [-1, 0],
-##                                 [ 0,-1], [ 1,-1], [-1,-1]]) # [steering wheel, gas pedal]
-        
-##        self.actions = np.array([[ 0, 1], [ 1, 1], [-1, 1],
-##                                 [ 0, 0], [ 1, 0], [-1, 0]]) # [steering wheel, gas pedal]
+        # self.actions = np.array([[ 0, 1], [ 1, 1], [-1, 1],
+        #                         [ 0, 0], [ 1, 0], [-1, 0],
+        #                         [ 0,-1], [ 1,-1], [-1,-1]]) # [steering wheel, gas pedal]
+
+        # self.actions = np.array([[ 0, 1], [ 1, 1], [-1, 1],
+        #                         [ 0, 0], [ 1, 0], [-1, 0]]) # [steering wheel, gas pedal]
         self.curState = curState
-        self.direction = direction # np.array([+-1, 0]) or np.array([0, +-1])
+        self.direction = direction # np.array([+-1, 0]) or np.array([0, +-1]), invisible to the agent
         self.QTable = {curState:np.zeros(len(self.actions))}
         self.rTotal = 0
         self.terminate = False
 
     # epsilon-greedy
-    def takeAction(self, epsilon = 0.9):
+    def takeAction(self, epsilon = 0.8):
 ##        if self.curState.v > 0:
 ##            if np.random.rand() <= epsilon:
 ##                action = self.actions[np.argmax(self.QTable[self.curState])] # exploitation
@@ -147,7 +148,9 @@ class State(object):
     # make objects comparable by speed and perception of its surroundings
     # the agent doesn't know its coordinates
     def __eq__(self, other):
-        return np.all(self.dists == other.dists) and self.v == other.v and np.all(self.destPos == other.destPos)
+        # return np.all(self.dists == other.dists) and self.v == other.v and np.all(self.destPos == other.destPos)
+        return np.all(self.dists == other.dists) #and np.all(self.destPos == other.destPos)
 
     def __hash__(self):
-        return hash(tuple(self.dists) + (self.v, ) + tuple(self.destPos))
+        # return hash(tuple(self.dists) + (self.v, ) + tuple(self.destPos))
+        return hash(tuple(self.dists) + tuple(self.destPos))

@@ -1,7 +1,18 @@
 from classes import *
 import numpy as np
 import matplotlib.pyplot as plt
-import winsound
+
+###### parameters #######
+learning_rate = 0.5
+discount_factor = 0.8
+
+epsilon_training = 0.4
+epsilon_experiment = 1
+
+numEpisodes = 5000
+numExperiments = 5
+maxIter = 100
+#########################
 
 def drawMap(car, world):
     x, y = car.curState.crd
@@ -10,21 +21,10 @@ def drawMap(car, world):
     for i in range(n):
         for j in range(m):
             if i == x and j == y:
-                print('*  ')
+                print('*  ', end = '')
             else:
-                print(world[n, m], ' ')
+                print(world[i, j], ' ', end = '')
         print('\n')
-
-###### parameters #######
-learning_rate = 0.8
-discount_factor = 1
-
-epsilon_training = 0.8
-epsilon_experiment = 1
-
-numEpisodes = 5000
-numExperiments = 10
-#########################
 
 world1 = np.array([[1, 1, 1, 1, 1],
                    [1, 0, 0, 1, 1],
@@ -46,18 +46,23 @@ envTrain = env2
 envTrain.setDest(np.array([5, 4]))
 
 envExp = env1
-envExp.setDest(np.array([3, 3]))
+envExp.setDest(np.array([3, 2]))
 
 initD = np.array([0, 1])
 startPt = np.array([1, 1])
 dists, destPos = envTrain.calDists(startPt, initD)
-initS = State(startPt, 0, dists = dists, destPos = destPos)
+initS = State(startPt, 1, dists = dists, destPos = destPos)
 cnt = 0
 rList = []
+
+car = Agent(initS, initD)
+
+# Start of numExperiments times of Experiments
 for _ in range(numExperiments):
     
     car = Agent(initS, initD)
 
+    # Train
     print("Start training...")
     for i in range(1, numEpisodes + 1):
         car.curState = initS
@@ -65,36 +70,37 @@ for _ in range(numExperiments):
         car.rTotal = 0
         car.terminate = False
         k = 0
-        while not car.terminate and k < 100:
+        while not car.terminate and k < maxIter:
             action = car.takeAction(epsilon_training)
             s, r, t = car.interact(action, envTrain, lr = learning_rate, y = discount_factor)
             k += 1
             
 ##        rList.append(car.rTotal)
-        if i % 100 == 0:
+        if i % 500 == 0:
             print("Iter", i, car.rTotal)
     print("Training finished.")
 
     ##plt.plot(np.arange(numEpisodes), rList)
     ##plt.show()
 
+    # Drive
     newCar = Agent(initS, initD)
     newCar.QTable = car.QTable
     k = 0
-    while not newCar.terminate and k < 100:
+    while not newCar.terminate and k < maxIter:
         k += 1
         action = newCar.takeAction(epsilon_experiment)
         s, _, _ = newCar.interact(action, envExp, update = False)
-        print(action, s.crd, s.v, s.destPos, newCar.direction)
+        print(s.crd, action, s.v, s.dists, s.destPos, newCar.direction)
         
     if np.all(s.crd == envExp.dest):
         print("Arrive!")
         cnt += 1
     print(newCar.rTotal)
     rList.append(newCar.rTotal)
+    drawMap(newCar, world1)
+
+for state in newCar.QTable:
+    print(state.crd, ':', newCar.QTable[state])
 print("Agent arrives the destination %d times in %d experiments."%(cnt, numExperiments))
 print(rList)
-
-##drawMap(newCar, world)
-
-winsound.Beep(1000, 200)
