@@ -10,7 +10,7 @@ discount_factor = 0.8
 epsilon_training = 0.8
 epsilon_experiment = 1
 
-numEpisodes = 10000
+numEpisodes = 100000
 numExperiments = 5
 maxIter = 100
 #########################
@@ -77,7 +77,7 @@ for _ in range(numExperiments):
             k += 1
 
         # rList.append(car.rTotal)
-        if i % 500 == 0:
+        if i % 5000 == 0:
             print("Iter", i, car.rTotal)
     print("Training finished.")
 
