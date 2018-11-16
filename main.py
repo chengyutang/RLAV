@@ -3,13 +3,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 ###### parameters #######
-learning_rate = 0.5
+learning_rate = 0.2
 discount_factor = 0.8
 
-epsilon_training = 0.4
+# epsilon: greedy level
+epsilon_training = 0.8
 epsilon_experiment = 1
 
-numEpisodes = 5000
+numEpisodes = 10000
 numExperiments = 5
 maxIter = 100
 #########################
@@ -46,13 +47,13 @@ envTrain = env2
 envTrain.setDest(np.array([5, 4]))
 
 envExp = env1
-envExp.setDest(np.array([3, 2]))
+envExp.setDest(np.array([3, 3]))
 
 initD = np.array([0, 1])
 startPt = np.array([1, 1])
 dists, destPos = envTrain.calDists(startPt, initD)
 initS = State(startPt, 1, dists = dists, destPos = destPos)
-cnt = 0
+numArrives = 0
 rList = []
 
 car = Agent(initS, initD)
@@ -75,13 +76,13 @@ for _ in range(numExperiments):
             s, r, t = car.interact(action, envTrain, lr = learning_rate, y = discount_factor)
             k += 1
 
-##        rList.append(car.rTotal)
+        # rList.append(car.rTotal)
         if i % 500 == 0:
             print("Iter", i, car.rTotal)
     print("Training finished.")
 
-    ##plt.plot(np.arange(numEpisodes), rList)
-    ##plt.show()
+    # plt.plot(np.arange(numEpisodes), rList)
+    # plt.show()
 
     # Drive
     newCar = Agent(initS, initD)
@@ -95,12 +96,12 @@ for _ in range(numExperiments):
 
     if np.all(s.crd == envExp.dest):
         print("Arrive!")
-        cnt += 1
+        numArrives += 1
     print(newCar.rTotal)
     rList.append(newCar.rTotal)
     drawMap(newCar, world1)
 
 for state in newCar.QTable:
     print(state.crd, ':', newCar.QTable[state])
-print("Agent arrives the destination %d times in %d experiments."%(cnt, numExperiments))
+print("Agent arrives the destination %d times in %d experiments."%(numArrives, numExperiments))
 print(rList)
