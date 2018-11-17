@@ -7,10 +7,10 @@ learning_rate = 0.2
 discount_factor = 0.8
 
 # epsilon: greedy level
-epsilon_training = 0.8
+epsilon_training = 0.5
 epsilon_experiment = 1
 
-numEpisodes = 100000
+numEpisodes = 5000
 numExperiments = 5
 maxIter = 100
 #########################
@@ -77,7 +77,7 @@ for _ in range(numExperiments):
             k += 1
 
         # rList.append(car.rTotal)
-        if i % 5000 == 0:
+        if i % 100 == 0:
             print("Iter", i, car.rTotal)
     print("Training finished.")
 
@@ -87,6 +87,8 @@ for _ in range(numExperiments):
     # Drive
     newCar = Agent(initS, initD)
     newCar.QTable = car.QTable
+    for state in newCar.QTable:
+        print(state.crd, ':', newCar.QTable[state])
     k = 0
     while not newCar.terminate and k < maxIter:
         k += 1
@@ -101,7 +103,7 @@ for _ in range(numExperiments):
     rList.append(newCar.rTotal)
     drawMap(newCar, world1)
 
-for state in newCar.QTable:
-    print(state.crd, ':', newCar.QTable[state])
+# for state in newCar.QTable:
+#     print(state.crd, ':', newCar.QTable[state])
 print("Agent arrives the destination %d times in %d experiments."%(numArrives, numExperiments))
 print(rList)
