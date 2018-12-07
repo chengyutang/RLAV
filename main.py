@@ -1,4 +1,6 @@
-from classes import *
+from Agent import *
+from Environment import *
+from State import *
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -11,7 +13,7 @@ epsilon_training = 0.5
 epsilon_experiment = 1
 
 numEpisodes = 5000
-numExperiments = 5
+numExperiments = 1
 maxIter = 100
 #########################
 
@@ -44,7 +46,7 @@ world2 = np.array([[1, 1, 1, 1, 1, 1],
 env2 = Environment(world2)
 
 envTrain = env2
-envTrain.setDest(np.array([5, 4]))
+envTrain.setDest(np.array([3, 4]))
 
 envExp = env1
 envExp.setDest(np.array([3, 3]))
@@ -79,7 +81,7 @@ for _ in range(numExperiments):
         # rList.append(car.rTotal)
         if i % 100 == 0:
             print("Iter", i, car.rTotal)
-    print("Training finished.")
+    print("Training finished.\n")
 
     # plt.plot(np.arange(numEpisodes), rList)
     # plt.show()
@@ -88,7 +90,7 @@ for _ in range(numExperiments):
     newCar = Agent(initS, initD)
     newCar.QTable = car.QTable
     for state in newCar.QTable:
-        print(state.crd, ':', newCar.QTable[state])
+        print(state.crd, state.dists, ':', newCar.QTable[state])
     k = 0
     while not newCar.terminate and k < maxIter:
         k += 1
