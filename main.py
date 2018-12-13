@@ -83,9 +83,6 @@ for _ in range(numExperiments):
             print("Iter", i, car.rTotal)
     print("Training finished.\n")
 
-    # plt.plot(np.arange(numEpisodes), rList)
-    # plt.show()
-
     # Drive
     newCar = Agent(initS, initD)
     newCar.QTable = car.QTable
