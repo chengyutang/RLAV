@@ -5,7 +5,7 @@ class Environment(object):
     
     def __init__(self, world = [], visibility = [1, 1, 1], speedLimit = 1):
         self.world = world # 1 for car, 2 for people, 3 for destiny
-        self.rewardTable = [0, -100, -800, 10000]
+        self.rewardTable = [-5, -500, -800, 1000]
         self.visibility = visibility
         self.speedLimit = speedLimit
         
@@ -28,12 +28,12 @@ class Environment(object):
 
     def step(self, curState, action, direction):
         terminate = False
-        reward = -2
+        reward = 0 # penalty for each step
         
         newV, newCrd = self.stateTransition(curState, action, direction)
         
         reward += self.rewardTable[self.world[newCrd[0], newCrd[1]]]
-        newDists, dest = self.calDists(newCrd, direction)
+        newDists, dest = self.calSurroundDists(newCrd, direction)
 
         # check termination
         if self.world[newCrd[0], newCrd[1]] > 0:
@@ -42,7 +42,7 @@ class Environment(object):
         newState = State(newCrd, newV, newDists, dest)
         return newState, reward, terminate
 
-    def calDists(self, crd, direction):
+    def calSurroundDists(self, crd, direction):
 
         temp = np.sign(self.dest - crd)
         dest = np.dot(temp, np.array([[direction[0], direction[1]], [direction[1], -direction[0]]]))

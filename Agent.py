@@ -33,10 +33,15 @@ class Agent(object):
 ##            else:
 ##                action = self.actions[np.random.randint(3)] # exploration
 
-        if np.random.rand(1) <= epsilon:
-            action = self.actions[np.argmax(self.QTable[self.curState])] # exploitation
-        else:
-            action = self.actions[np.random.randint(len(self.actions))] # exploration
+        if np.random.rand(1) <= epsilon: #exploit with possibility of epsilon
+            bestChoices = np.argwhere(self.QTable[self.curState] == np.amax(self.QTable[self.curState]))
+            bestChoices = bestChoices.reshape(len(bestChoices))
+            idx = np.random.choice(bestChoices)
+            action = self.actions[idx]
+            # action = self.actions[np.argmax(self.QTable[self.curState])] # exploitation
+        
+        else: #explore with possibility of epsilon
+            action = self.actions[np.random.randint(self.actions.shape[0])] # exploration
 
         # if steering wheel is turned, change direction
         if action[0] != 0:
@@ -44,7 +49,7 @@ class Agent(object):
         
         return action
 
-    def interact(self, action, env, update = True, lr = 0.8, y = 0.8):
+    def interact(self, action, env, update = True, lr = 0.001, y = 0.8):
         s, r, t = env.step(self.curState, action, self.direction)
         self.rTotal += r
         self.terminate = t
@@ -56,6 +61,13 @@ class Agent(object):
         return s, r, t
     
     def updateQTable(self, s, a, r, lr, y):
+        """
+        s: next state of taking action a at state self.curState
+        a: action
+        r: reward of taking action a
+        lr: learning rate
+        y: discount factor
+        """
         actionHelper = self.actions.tolist()
         actionIdx = actionHelper.index(list(a))
-        self.QTable[self.curState][actionIdx] = (1 - lr) * self.QTable[self.curState][actionIdx] + lr * (r + y * max(self.QTable[s]) - self.QTable[self.curState][actionIdx])
+        self.QTable[self.curState][actionIdx] = (1 - lr) * self.QTable[self.curState][actionIdx] + lr * (r + y * np.amax(self.QTable[s]) - self.QTable[self.curState][actionIdx])
