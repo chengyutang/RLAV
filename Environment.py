@@ -4,14 +4,18 @@ import numpy as np
 class Environment(object):
     
     def __init__(self, world = [], visibility = [1, 1, 1], speedLimit = 1):
-        self.world = world # 1 for car, 2 for people, 3 for destiny
+        """
+        world: 2D numpy integer array. 0 for blank, 1 for car, 2 for pedestrian, 3 for destination
+        rewardTable: [penalty_for_each_step, car, pedestrian, destination] penalty for each object
+        visibility: [front, right, left] sensor visibilitie (furthest visible distance) on each direction.
+        speedLimit: integer
+        """
+        self.world = world
         self.rewardTable = [-5, -500, -800, 1000]
         self.visibility = visibility
         self.speedLimit = speedLimit
         
     def stateTransition(self, curState, action, direction):
-        # action: [(-1, 0, 1), (-1, 0, 1)], [steering wheel, gas pedal]
-        
         newV = curState.v + action[1]
         newV = min(newV, self.speedLimit)
         newV = max(newV, 0)
@@ -58,17 +62,17 @@ class Environment(object):
         
         # determine the distance to the closest obstacle on each direction
         crdF = crd + (distFront + 1) * direction
-        while distFront + 1 <= self.visibility[0] and self.inMap(crdF) and self.world[crdF[0], crdF[1]]==0:#in (0, 3)
+        while distFront + 1 <= self.visibility[0] and self.inMap(crdF) and self.world[crdF[0], crdF[1]] in [0, 3]: # == 0: # in (0, 3)
             distFront += 1
             crdF = crd + (distFront + 1) * direction
         
         crdR = crd + (distRight + 1) * right
-        while distRight + 1 <= self.visibility[1] and self.inMap(crdR) and self.world[crdR[0], crdR[1]]==0:#in (0, 3)
+        while distRight + 1 <= self.visibility[1] and self.inMap(crdR) and self.world[crdR[0], crdR[1]] in [0, 3]: # == 0: # in (0, 3)
             distRight += 1
             crdR = crd + (distRight + 1) * direction
 
         crdL = crd + (distLeft + 1) * left
-        while distLeft + 1 <= self.visibility[2] and self.inMap(crdL) and self.world[crdL[0], crdL[1]]==0:#in (0, 3)
+        while distLeft + 1 <= self.visibility[2] and self.inMap(crdL) and self.world[crdL[0], crdL[1]] in [0, 3]: # == 0: # in (0, 3)
             distLeft += 1
             crdL = crd + (distLeft + 1) * direction
 
@@ -77,6 +81,6 @@ class Environment(object):
     def inMap(self, crd):
         return np.all(crd >= 0) and np.all(crd < self.world.shape)
 
-    def setDest(self, destCrd):
+    def setDestination(self, destCrd):
         self.world[destCrd[0], destCrd[1]] = 3
         self.dest = destCrd
