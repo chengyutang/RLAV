@@ -114,7 +114,7 @@ for _ in range(numExperiments):
 	if np.all(s.crd == envExp.dest):
 		print("Arrive!")
 		numArrives += 1
-	print("Final reward:", newCar.rTotal)
+	print("\nFinal reward:", newCar.rTotal)
 	rList.append(newCar.rTotal)
 	drawMap(newCar, envExp.world)
 

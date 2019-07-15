@@ -37,16 +37,6 @@ class Agent(object):
 
 	# epsilon-greedy
 	def takeAction(self, epsilon = 0.8):
-		if self.curState.v > 0:
-			if np.random.rand() <= epsilon:
-				action = self.actions[np.argmax(self.QTable[self.curState])] # exploitation
-			else:
-				action = self.actions[np.random.randint(len(self.actions))] # exploration
-		else:
-			if np.random.rand() <= epsilon:
-				action = self.actions[np.argmax(self.QTable[self.curState][0:3])] # exploitation
-			else:
-				action = self.actions[np.random.randint(3)] # exploration
 
 		# human knowledge:
 		# if np.all(self.curState.dists == [1, 0, 0]):
