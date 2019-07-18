@@ -1,2 +1,2 @@
 # RLAV
-Autonomous driving demo using Reinforcement Learning
+A python framework for agent-based partially observable reinforcement learning
