@@ -62,7 +62,8 @@ for _ in range(numExperiments):
 
 	car = Agent(initS, initD)
 	numSuccess = 0
-	# Train
+
+	# Training
 	dynamic_epsilon = 0
 	print("Start training...")
 	for i in range(1, numEpisodes + 1):
@@ -96,7 +97,7 @@ for _ in range(numExperiments):
 			print("Iter", i, car.rTotal, numSuccess)
 	print("Training finished.\n")
 
-	# Drive
+	# Testing
 	newCar = Agent(initS, initD)
 	newCar.QTable = car.QTable
 	print("Learned Q-Table:")
